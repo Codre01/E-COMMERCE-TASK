@@ -5,7 +5,7 @@ import 'package:minified_commerce/common/utils/kstrings.dart';
 import 'package:minified_commerce/common/widgets/app_style.dart';
 import 'package:minified_commerce/common/widgets/reusable_text.dart';
 import 'package:minified_commerce/src/auth/views/login_screen.dart';
-import 'package:minified_commerce/src/products/widgets/explore_products.dart';
+import 'package:minified_commerce/src/wishlist/widgets/wishlist_list.dart';
 
 class WishlistScreen extends StatelessWidget {
   const WishlistScreen({super.key});
@@ -19,6 +19,7 @@ class WishlistScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(
         automaticallyImplyLeading: false,
+        centerTitle: true,
         title: ReusableText(
           text: AppText.kWishlist,
           style: appStyle(18, Kolors.kPrimary, FontWeight.bold),
@@ -26,7 +27,7 @@ class WishlistScreen extends StatelessWidget {
       ),
       body: const Padding(
         padding: EdgeInsets.all(8.0),
-        child: ExploreProducts(),
+        child: WishlistList(),
       ),
     );
   }

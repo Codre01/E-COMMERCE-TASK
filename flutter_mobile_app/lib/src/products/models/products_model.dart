@@ -1,8 +1,4 @@
-// To parse this JSON data, do
-//
-//     final products = productsFromJson(jsonString);
 
-import 'package:meta/meta.dart';
 import 'dart:convert';
 
 List<Products> productsFromJson(String str) => List<Products>.from(json.decode(str).map((x) => Products.fromJson(x)));
@@ -33,8 +29,8 @@ class Products {
         required this.clothesType,
         required this.ratings,
         required this.colors,
-        required this.imageUrls,
         required this.sizes,
+        required this.imageUrls,
         required this.createdAt,
         required this.category,
         required this.brand,
@@ -46,11 +42,11 @@ class Products {
         price: json["price"]?.toDouble(),
         description: json["description"],
         isFeatured: json["is_featured"],
-        clothesType: json["clothesType"],
-        ratings: json["ratings"]?.toDouble(),
-        colors: List<String>.from(json["colors"].map((x) => x)),
-        imageUrls: List<String>.from(json["imageUrls"].map((x) => x)),
+        clothesType: json["clothes_type"],
+        ratings: json["rating"]?.toDouble(),
+        colors: List<String>.from(json["color"].map((x) => x)),
         sizes: List<String>.from(json["sizes"].map((x) => x)),
+        imageUrls: List<String>.from(json["image_urls"].map((x) => x)),
         createdAt: DateTime.parse(json["created_at"]),
         category: json["category"],
         brand: json["brand"],
@@ -62,11 +58,11 @@ class Products {
         "price": price,
         "description": description,
         "is_featured": isFeatured,
-        "clothesType": clothesType,
-        "ratings": ratings,
-        "colors": List<dynamic>.from(colors.map((x) => x)),
-        "imageUrls": List<dynamic>.from(imageUrls.map((x) => x)),
+        "clothes_type": clothesType,
+        "rating": ratings,
+        "color": List<dynamic>.from(colors.map((x) => x)),
         "sizes": List<dynamic>.from(sizes.map((x) => x)),
+        "image_urls": List<dynamic>.from(imageUrls.map((x) => x)),
         "created_at": createdAt.toIso8601String(),
         "category": category,
         "brand": brand,

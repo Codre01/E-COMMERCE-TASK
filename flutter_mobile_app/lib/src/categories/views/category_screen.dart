@@ -4,6 +4,7 @@ import 'package:minified_commerce/common/widgets/app_style.dart';
 import 'package:minified_commerce/common/widgets/back_button.dart';
 import 'package:minified_commerce/common/widgets/reusable_text.dart';
 import 'package:minified_commerce/src/categories/controllers/category_notifier.dart';
+import 'package:minified_commerce/src/categories/widgets/products_by_category.dart';
 import 'package:provider/provider.dart';
 
 class CategoryScreen extends StatelessWidget {
@@ -18,7 +19,9 @@ class CategoryScreen extends StatelessWidget {
           text: context.read<CategoryNotifier>().category,
           style: appStyle(16, Kolors.kPrimary, FontWeight.bold),
         ),
+        centerTitle: true,
       ),
+      body: const ProductsByCategory(),
     );
   }
 }

@@ -5,6 +5,7 @@ import 'package:minified_commerce/common/utils/kstrings.dart';
 import 'package:minified_commerce/common/widgets/app_style.dart';
 import 'package:minified_commerce/common/widgets/reusable_text.dart';
 import 'package:minified_commerce/const/constants.dart';
+import 'package:minified_commerce/src/adresses/widget/checkout_address_list.dart';
 
 Future<dynamic> changeAddressBottomSheet(BuildContext context) {
   return showModalBottomSheet<void>(
@@ -41,9 +42,10 @@ Future<dynamic> changeAddressBottomSheet(BuildContext context) {
               height: 10.h,
             ),
             // TODO: Add Address selection
-            // SizedBox(
-            //   height: ScreenUtil().screenHeight*0.6,
-            //   child: const CheckoutAddressSelection())
+            SizedBox(
+              height: ScreenUtil().screenHeight*0.6,
+              child: const CheckoutAddressList()
+              )
           ],
         ),
       );

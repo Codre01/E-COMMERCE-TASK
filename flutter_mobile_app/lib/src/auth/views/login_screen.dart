@@ -97,7 +97,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 SizedBox(
                   height: 25.h,
                 ),
-                context.watch<AuthNotifier>().isLoading
+                context.watch<AuthNotifier>().isLoginLoading
                     ? const Center(
                         child: CircularProgressIndicator(
                           backgroundColor: Kolors.kPrimary,
@@ -114,7 +114,6 @@ class _LoginScreenState extends State<LoginScreen> {
                             username: _usernameController.text,
                           );
                           String data = loginModelToJson(model);
-                          print(data);
                           context
                               .read<AuthNotifier>()
                               .loginFunc(data, context);

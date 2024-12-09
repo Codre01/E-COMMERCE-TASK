@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minified_commerce/src/adresses/views/shipping_address.dart';
 import 'package:minified_commerce/src/auth/views/registration_screen.dart';
+import 'package:minified_commerce/src/checkout/views/checkout_screen.dart';
 import 'package:minified_commerce/src/products/views/product_screen.dart';
 import 'package:minified_commerce/src/auth/views/login_screen.dart';
 import 'package:minified_commerce/src/categories/views/categories_screen.dart';
@@ -77,10 +79,10 @@ final GoRouter _router = GoRouter(
     //   builder: (context, state) => const AddAddress(),
     // ),
 
-    // GoRoute(
-    //   path: '/addresses',
-    //   builder: (context, state) => const AddressesListPage(),
-    // ),
+    GoRoute(
+      path: '/addresses',
+      builder: (context, state) => const ShippingAddress(),
+    ),
 
      GoRoute(
       path: '/notifications',
@@ -92,10 +94,10 @@ final GoRouter _router = GoRouter(
     //   builder: (context, state) => const TrackOrderPage(),
     // ),
 
-    // GoRoute(
-    //   path: '/checkout',
-    //   builder: (context, state) => const CheckoutPage(),
-    // ),
+    GoRoute(
+      path: '/checkout',
+      builder: (context, state) => const CheckoutScreen(),
+    ),
 
     //   GoRoute(
     //   path: '/successful',

@@ -11,7 +11,8 @@ import 'package:minified_commerce/common/widgets/back_button.dart';
 import 'package:minified_commerce/common/widgets/error_modal.dart';
 import 'package:minified_commerce/common/widgets/login_bottom_sheet.dart';
 import 'package:minified_commerce/common/widgets/reusable_text.dart';
-import 'package:minified_commerce/const/constants.dart';
+import 'package:minified_commerce/src/cart/controllers/cart_notifier.dart';
+import 'package:minified_commerce/src/cart/models/create_cart_model.dart';
 import 'package:minified_commerce/src/products/controllers/colors_sizes_notifier.dart';
 import 'package:minified_commerce/src/products/controllers/product_notifier.dart';
 import 'package:minified_commerce/src/products/widgets/color_selection_widget.dart';
@@ -19,6 +20,7 @@ import 'package:minified_commerce/src/products/widgets/expandable_text.dart';
 import 'package:minified_commerce/src/products/widgets/product_bottom_bar.dart';
 import 'package:minified_commerce/src/products/widgets/product_sizes_widget.dart';
 import 'package:minified_commerce/src/products/widgets/similar_products.dart';
+import 'package:minified_commerce/src/wishlist/controllers/wishlist_notifier.dart';
 import 'package:provider/provider.dart';
 
 class ProductScreen extends StatelessWidget {
@@ -44,16 +46,30 @@ class ProductScreen extends StatelessWidget {
                 actions: [
                   Padding(
                     padding: const EdgeInsets.only(right: 16.0),
-                    child: GestureDetector(
-                      onTap: () {},
-                      child: const CircleAvatar(
-                        backgroundColor: Kolors.kSecondaryLight,
-                        child: Icon(
-                          AntDesign.heart,
-                          color: Kolors.kRed,
-                          size: 18,
-                        ),
-                      ),
+                    child: Consumer<WishlistNotifier>(
+                      builder: (context, wishlistNotifier, child) {
+                        return GestureDetector(
+                          onTap: () {
+                            if (accessToken == null) {
+                              loginBottomSheet(context);
+                            } else {
+                              wishlistNotifier.addRemoveWishlist(
+                                  productNotifier.product!.id, () {});
+                            }
+                          },
+                          child: CircleAvatar(
+                            backgroundColor: Kolors.kSecondaryLight,
+                            child: Icon(
+                              AntDesign.heart,
+                              color: wishlistNotifier.wishlist
+                                      .contains(productNotifier.product!.id)
+                                  ? Kolors.kRed
+                                  : Kolors.kGray,
+                              size: 18,
+                            ),
+                          ),
+                        );
+                      },
                     ),
                   ),
                 ],
@@ -227,8 +243,11 @@ class ProductScreen extends StatelessWidget {
                     context.read<ColorsSizesNotifier>().sizes == "") {
                   showErrorPopup(context, AppText.kCartErrorText,
                       "Error Adding to Cart", true);
-                }else{
-                  
+                } else {
+                  var data = AddCartModel(product: context.read<ProductNotifier>().product!.id, quantity: 1, size: context.read<ColorsSizesNotifier>().sizes, color: context.read<ColorsSizesNotifier>().color);
+                  String cartData = addCartModelToJson(data);
+
+                  context.read<CartNotifier>().addToCart(cartData, context);
                 }
               }
             },

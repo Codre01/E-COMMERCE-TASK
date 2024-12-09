@@ -1,14 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:go_router/go_router.dart';
 import 'package:minified_commerce/common/services/storage.dart';
 import 'package:minified_commerce/common/utils/kcolors.dart';
 import 'package:minified_commerce/common/widgets/app_style.dart';
 import 'package:minified_commerce/common/widgets/custom_button.dart';
 import 'package:minified_commerce/common/widgets/help_bottom_sheet.dart';
 import 'package:minified_commerce/common/widgets/reusable_text.dart';
+import 'package:minified_commerce/src/auth/controllers/auth_notifier.dart';
 import 'package:minified_commerce/src/auth/views/login_screen.dart';
+import 'package:minified_commerce/src/entry_point/controller/bottom_tab_notifier.dart';
+import 'package:minified_commerce/src/profile/models/profile_model.dart';
 import 'package:minified_commerce/src/profile/widgets/tile_widget.dart';
+import 'package:provider/provider.dart';
 
 class ProfileScreen extends StatelessWidget {
   const ProfileScreen({super.key});
@@ -16,18 +21,20 @@ class ProfileScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String? accessToken = Storage().getString('accessToken');
-    if(accessToken == null){
+    if (accessToken == null) {
       return const LoginScreen();
     }
     return Scaffold(
-      body: ListView(
+        body: Consumer<AuthNotifier>(builder: (context, authNotifier, child) {
+      ProfileModel? user = authNotifier.getUserData();
+      return ListView(
         children: [
           Column(
             children: [
               SizedBox(
                 height: 30.h,
               ),
-              CircleAvatar(
+              const CircleAvatar(
                 radius: 35,
                 backgroundColor: Kolors.kOffWhite,
                 // backgroundImage: ,
@@ -36,7 +43,7 @@ class ProfileScreen extends StatelessWidget {
                 height: 15.h,
               ),
               ReusableText(
-                text: "olaoye@gmail.com",
+                text: user?.email ?? 'No email available',
                 style: appStyle(11, Kolors.kGray, FontWeight.normal),
               ),
               SizedBox(
@@ -49,7 +56,7 @@ class ProfileScreen extends StatelessWidget {
                   borderRadius: BorderRadius.circular(10),
                 ),
                 child: ReusableText(
-                  text: "Paul Kolade",
+                  text: user?.username ?? 'No username available',
                   style: appStyle(14, Kolors.kDark, FontWeight.w600),
                 ),
               ),
@@ -70,7 +77,9 @@ class ProfileScreen extends StatelessWidget {
                 ProfileTileWidget(
                   title: "Shipping Address",
                   leading: MaterialIcons.location_pin,
-                  onTap: () {},
+                  onTap: () {
+                    context.push("/addresses");
+                  },
                 ),
                 ProfileTileWidget(
                   title: "Privacy Policy",
@@ -92,13 +101,20 @@ class ProfileScreen extends StatelessWidget {
                     btnColor: Kolors.kRed,
                     btnWidth: ScreenUtil().screenWidth,
                     btnHeight: 35.h,
+                    onTap: () {
+                      Storage().removeKey("accessToken");
+                      Storage().removeKey("refreshToken");
+                      Storage().removeKey("mii");
+                      // context.read<TabIndexNotifier>().setIndex(0);
+                      context.go("/login");
+                    },
                   ),
                 )
               ],
             ),
           )
         ],
-      ),
-    );
+      );
+    }));
   }
 }

@@ -72,7 +72,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   focusNode: _passwordNode,
                   hintText: "Username",
                   controller: _usernameController,
-                  prefixIcon: Icon(
+                  prefixIcon: const Icon(
                     CupertinoIcons.profile_circled,
                     size: 20,
                     color: Kolors.kGray,
@@ -90,7 +90,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                   focusNode: _passwordNode,
                   hintText: "Email",
                   controller: _emailController,
-                  prefixIcon: Icon(
+                  prefixIcon: const Icon(
                     CupertinoIcons.mail,
                     size: 20,
                     color: Kolors.kGray,
@@ -111,7 +111,7 @@ class _RegistrationScreenState extends State<RegistrationScreen> {
                 SizedBox(
                   height: 25.h,
                 ),
-                context.watch<AuthNotifier>().isLoading
+                context.watch<AuthNotifier>().isRegisterLoading
                     ? const Center(
                         child: CircularProgressIndicator(
                           backgroundColor: Kolors.kPrimary,

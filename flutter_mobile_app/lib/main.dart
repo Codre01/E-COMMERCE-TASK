@@ -5,12 +5,16 @@ import 'package:get_storage/get_storage.dart';
 import 'package:minified_commerce/common/utils/app_routes.dart';
 import 'package:minified_commerce/common/utils/environment.dart';
 import 'package:minified_commerce/common/utils/kstrings.dart';
+import 'package:minified_commerce/src/adresses/controllers/address_notifier.dart';
 import 'package:minified_commerce/src/auth/controllers/auth_notifier.dart';
 import 'package:minified_commerce/src/auth/controllers/password_notifier.dart';
+import 'package:minified_commerce/src/cart/controllers/cart_notifier.dart';
 import 'package:minified_commerce/src/products/controllers/colors_sizes_notifier.dart';
 import 'package:minified_commerce/src/products/controllers/product_notifier.dart';
 import 'package:minified_commerce/src/categories/controllers/category_notifier.dart';
 import 'package:minified_commerce/src/home/controllers/home_tab_notifier.dart';
+import 'package:minified_commerce/src/search/controllers/search_notifier.dart';
+import 'package:minified_commerce/src/wishlist/controllers/wishlist_notifier.dart';
 import 'package:provider/provider.dart';
 
 import 'src/entry_point/controller/bottom_tab_notifier.dart';
@@ -32,6 +36,10 @@ void main() async {
     ChangeNotifierProvider(create: (context) => ColorsSizesNotifier()),
     ChangeNotifierProvider(create: (context) => PasswordNotifier()),
     ChangeNotifierProvider(create: (context) => AuthNotifier()),
+    ChangeNotifierProvider(create: (context) => SearchNotifier()),
+    ChangeNotifierProvider(create: (context) => WishlistNotifier()),
+    ChangeNotifierProvider(create: (context) => CartNotifier()),
+    ChangeNotifierProvider(create: (context) => AddressNotifier()),
   ],
   child: const MyApp()
   ));
