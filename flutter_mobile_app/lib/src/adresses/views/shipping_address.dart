@@ -61,7 +61,7 @@ class ShippingAddress extends HookWidget {
       ),
       bottomNavigationBar: GestureDetector(
         onTap: () {
-          addAddressModalSheet(context);
+          addAddressModalSheet(context, refetch);
         },
         child: Container(
           height: 80,

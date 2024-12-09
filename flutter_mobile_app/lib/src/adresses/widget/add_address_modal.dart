@@ -2,6 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:minified_commerce/common/models/api_error_model.dart';
 import 'package:minified_commerce/common/services/storage.dart';
 import 'package:minified_commerce/common/utils/environment.dart';
 import 'package:minified_commerce/common/utils/kcolors.dart';
@@ -9,11 +10,16 @@ import 'package:minified_commerce/common/utils/kstrings.dart';
 import 'package:minified_commerce/common/widgets/app_style.dart';
 import 'package:minified_commerce/common/widgets/custom_button.dart';
 import 'package:minified_commerce/common/widgets/email_textfield.dart';
+import 'package:minified_commerce/common/widgets/error_modal.dart';
 import 'package:minified_commerce/common/widgets/reusable_text.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-Future<dynamic> addAddressModalSheet(BuildContext context) {
+import 'package:minified_commerce/src/adresses/controllers/address_notifier.dart';
+import 'package:minified_commerce/src/adresses/hooks/fetch_address_list.dart';
+import 'package:provider/provider.dart';
+
+Future<dynamic> addAddressModalSheet(BuildContext context, Function()? refetch) {
   final TextEditingController _addressController = TextEditingController();
   final TextEditingController _phoneController = TextEditingController();
   String? accessToken = Storage().getString('accessToken');
@@ -34,12 +40,7 @@ Future<dynamic> addAddressModalSheet(BuildContext context) {
       Future<void> _sendAddressData() async {
         // Input validation
         if (_addressController.text.isEmpty || _phoneController.text.isEmpty) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text('Please fill in all fields'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          showErrorPopup(context, "Please fill in all fields", null, null);
           return;
         }
 
@@ -47,7 +48,10 @@ Future<dynamic> addAddressModalSheet(BuildContext context) {
         try {
           final response = await http.post(
             url,
-            headers: {'Content-Type': 'application/json', 'Authorization': 'Bearer $accessToken'},
+            headers: {
+              'Content-Type': 'application/json',
+              'Authorization': 'Bearer $accessToken'
+            },
             body: jsonEncode({
               'address': _addressController.text,
               'phone': _phoneController.text,
@@ -58,27 +62,14 @@ Future<dynamic> addAddressModalSheet(BuildContext context) {
 
           if (response.statusCode == 201) {
             Navigator.pop(context);
-            ScaffoldMessenger.of(context).showSnackBar(
-              const SnackBar(
-                content: Text('Address added successfully'),
-                backgroundColor: Colors.green,
-              ),
-            );
+            refetch!();
           } else {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(
-                content: Text('Failed to add address: ${response.body}'),
-                backgroundColor: Colors.red,
-              ),
-            );
+            var data = apiErrorFromJson(response.body);
+            showErrorPopup(context, data.message, null, null);
           }
         } catch (e) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Error: ${e.toString()}'),
-              backgroundColor: Colors.red,
-            ),
-          );
+          var data = apiErrorFromJson(e.toString());
+            showErrorPopup(context, data.message, null, null);
         }
       }
 
