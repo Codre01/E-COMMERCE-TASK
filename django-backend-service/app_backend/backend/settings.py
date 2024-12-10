@@ -40,6 +40,8 @@ INSTALLED_APPS = [
     "wishlist",
     "cart",
     "checkout",
+    "order",
+    "admins",
 ]
 
 MIDDLEWARE = [

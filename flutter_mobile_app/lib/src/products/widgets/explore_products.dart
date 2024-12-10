@@ -3,7 +3,6 @@ import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_staggered_grid_view/flutter_staggered_grid_view.dart';
 import 'package:minified_commerce/common/services/storage.dart';
-import 'package:minified_commerce/common/widgets/empty_screen_widget.dart';
 import 'package:minified_commerce/common/widgets/login_bottom_sheet.dart';
 import 'package:minified_commerce/common/widgets/shimmers/list_shimmer.dart';
 import 'package:minified_commerce/const/resource.dart';

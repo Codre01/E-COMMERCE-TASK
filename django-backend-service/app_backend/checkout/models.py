@@ -20,11 +20,4 @@ class Address(models.Model):
     def __str__(self):
         return "{}/{}".format(self.user_id.username, self.address_type, self.phone)
     
-class Extras(models.Model):
-    is_verified = models.BooleanField(default=False)
-    otp = models.CharField(max_length=6, default="")
-    user_id = models.ForeignKey(User, on_delete=models.CASCADE)
-    
-    def __str__(self):
-        return "{}/{}".format(self.user_id.username, self.id)
-    
+

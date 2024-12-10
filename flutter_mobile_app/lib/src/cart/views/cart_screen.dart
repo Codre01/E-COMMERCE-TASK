@@ -22,11 +22,11 @@ class CartScreen extends HookWidget {
   Widget build(BuildContext context) {
     String? accessToken = Storage().getString('accessToken');
     
+    
     final result = fetchCart();
     final carts = result.carts;
     final isLoading = result.isLoading;
     final refetch = result.refetch;
-    final error = result.error;
 
     if (accessToken == null) {
       return const LoginScreen();

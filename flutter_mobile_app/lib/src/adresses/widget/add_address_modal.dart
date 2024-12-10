@@ -6,7 +6,6 @@ import 'package:minified_commerce/common/models/api_error_model.dart';
 import 'package:minified_commerce/common/services/storage.dart';
 import 'package:minified_commerce/common/utils/environment.dart';
 import 'package:minified_commerce/common/utils/kcolors.dart';
-import 'package:minified_commerce/common/utils/kstrings.dart';
 import 'package:minified_commerce/common/widgets/app_style.dart';
 import 'package:minified_commerce/common/widgets/custom_button.dart';
 import 'package:minified_commerce/common/widgets/email_textfield.dart';
@@ -15,9 +14,6 @@ import 'package:minified_commerce/common/widgets/reusable_text.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
 
-import 'package:minified_commerce/src/adresses/controllers/address_notifier.dart';
-import 'package:minified_commerce/src/adresses/hooks/fetch_address_list.dart';
-import 'package:provider/provider.dart';
 
 Future<dynamic> addAddressModalSheet(BuildContext context, Function()? refetch) {
   final TextEditingController _addressController = TextEditingController();

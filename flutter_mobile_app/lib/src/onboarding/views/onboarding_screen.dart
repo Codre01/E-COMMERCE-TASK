@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:minified_commerce/common/services/storage.dart';
 import 'package:minified_commerce/common/utils/kcolors.dart';
+import 'package:minified_commerce/src/entry_point/views/entry_point.dart';
 import 'package:minified_commerce/src/onboarding/controllers/onboarding_notifier.dart';
 import 'package:minified_commerce/src/onboarding/widgets/onboarding_screen_one.dart';
 import 'package:minified_commerce/src/onboarding/widgets/onboarding_screen_two.dart';
@@ -20,7 +22,10 @@ class _OnBoardingScreenState extends State<OnBoardingScreen> {
   @override
   Widget build(BuildContext context) {
     late final PageController _pageController;
-
+    String? accessToken = Storage().getString('accessToken');
+    if (accessToken != null) {
+      return AppEntryPoint();
+    }
     @override
     void initState() {
       controller:

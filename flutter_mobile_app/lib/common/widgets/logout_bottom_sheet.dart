@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:go_router/go_router.dart';
+import 'package:minified_commerce/src/entry_point/controller/bottom_tab_notifier.dart';
 import 'package:provider/provider.dart';
 
 import '../../const/constants.dart';
@@ -61,10 +62,12 @@ Future<dynamic> logoutBottomSheet(BuildContext context) {
                   CustomBtn(
                     text: "Yes, Logout",
                     onTap: () {
-                      // Storage().removeKey('accessToken');
-                      // context.read<TabIndexNotifier>().tabIndex = 0;
-                      // context.go("/home");
-                      // context.pop();
+                      Storage().removeKey("accessToken");
+                      Storage().removeKey("refreshToken");
+                      Storage().removeKey("wishlist");
+                      Storage().removeKey("mii");
+                      context.read<TabIndexNotifier>().setIndex(0);
+                      context.go("/login");
                     },
                     btnHeight: 35.h,
                     radius: 16,

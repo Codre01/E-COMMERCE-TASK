@@ -7,10 +7,10 @@ import 'package:minified_commerce/common/utils/kcolors.dart';
 import 'package:minified_commerce/common/widgets/app_style.dart';
 import 'package:minified_commerce/common/widgets/custom_button.dart';
 import 'package:minified_commerce/common/widgets/help_bottom_sheet.dart';
+import 'package:minified_commerce/common/widgets/logout_bottom_sheet.dart';
 import 'package:minified_commerce/common/widgets/reusable_text.dart';
 import 'package:minified_commerce/src/auth/controllers/auth_notifier.dart';
 import 'package:minified_commerce/src/auth/views/login_screen.dart';
-import 'package:minified_commerce/src/entry_point/controller/bottom_tab_notifier.dart';
 import 'package:minified_commerce/src/profile/models/profile_model.dart';
 import 'package:minified_commerce/src/profile/widgets/tile_widget.dart';
 import 'package:provider/provider.dart';
@@ -72,7 +72,9 @@ class ProfileScreen extends StatelessWidget {
                 ProfileTileWidget(
                   title: "My Orders",
                   leading: Octicons.checklist,
-                  onTap: () {},
+                  onTap: () {
+                    context.push("/orders");
+                  },
                 ),
                 ProfileTileWidget(
                   title: "Shipping Address",
@@ -102,11 +104,7 @@ class ProfileScreen extends StatelessWidget {
                     btnWidth: ScreenUtil().screenWidth,
                     btnHeight: 35.h,
                     onTap: () {
-                      Storage().removeKey("accessToken");
-                      Storage().removeKey("refreshToken");
-                      Storage().removeKey("mii");
-                      // context.read<TabIndexNotifier>().setIndex(0);
-                      context.go("/login");
+                      logoutBottomSheet(context);
                     },
                   ),
                 )

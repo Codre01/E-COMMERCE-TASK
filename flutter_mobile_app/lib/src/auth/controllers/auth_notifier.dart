@@ -40,7 +40,7 @@ class AuthNotifier with ChangeNotifier {
         final jwtToken = jwtTokenModelFromJson(response.body);
         Storage().setString("accessToken", jwtToken.access);
         Storage().setString("refreshToken", jwtToken.refresh);
-
+        ctx.go("/home");
         getUser(jwtToken.access, ctx);
       } else {
         var errorData = jsonDecode(response.body);

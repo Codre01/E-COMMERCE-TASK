@@ -6,8 +6,3 @@ class AddressSerializer(serializers.ModelSerializer):
         model = models.Address
         fields = '__all__'
 
-
-class ExtrasSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = models.Extras
-        fields = '__all__'

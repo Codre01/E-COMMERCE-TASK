@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_hooks/flutter_hooks.dart';
 import 'package:flutter_vector_icons/flutter_vector_icons.dart';
+import 'package:go_router/go_router.dart';
+import 'package:minified_commerce/common/services/storage.dart';
 import 'package:minified_commerce/common/utils/kcolors.dart';
 import 'package:minified_commerce/common/widgets/app_style.dart';
+import 'package:minified_commerce/src/auth/views/login_screen.dart';
 import 'package:minified_commerce/src/cart/hooks/fetch_cart_count.dart';
 import 'package:minified_commerce/src/cart/views/cart_screen.dart';
 import 'package:minified_commerce/src/entry_point/controller/bottom_tab_notifier.dart';
@@ -22,6 +25,10 @@ class AppEntryPoint extends HookWidget {
   ];
   @override
   Widget build(BuildContext context) {
+    String? accessToken = Storage().getString('accessToken');
+    if (accessToken == null) {
+      return const LoginScreen();
+    }
     final results = fetchCartCount(context);
     final data = results.count;
     return Consumer<TabIndexNotifier>(

@@ -9,6 +9,7 @@ import 'package:minified_commerce/src/adresses/controllers/address_notifier.dart
 import 'package:minified_commerce/src/auth/controllers/auth_notifier.dart';
 import 'package:minified_commerce/src/auth/controllers/password_notifier.dart';
 import 'package:minified_commerce/src/cart/controllers/cart_notifier.dart';
+import 'package:minified_commerce/src/order/controllers/order_notifier.dart';
 import 'package:minified_commerce/src/products/controllers/colors_sizes_notifier.dart';
 import 'package:minified_commerce/src/products/controllers/product_notifier.dart';
 import 'package:minified_commerce/src/categories/controllers/category_notifier.dart';
@@ -40,6 +41,7 @@ void main() async {
     ChangeNotifierProvider(create: (context) => WishlistNotifier()),
     ChangeNotifierProvider(create: (context) => CartNotifier()),
     ChangeNotifierProvider(create: (context) => AddressNotifier()),
+    ChangeNotifierProvider(create: (context) => OrderNotifier()),
   ],
   child: const MyApp()
   ));
