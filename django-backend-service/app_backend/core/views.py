@@ -10,6 +10,11 @@ class CategoryList(generics.ListAPIView):
     permission_classes = [AllowAny]
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
+    
+class BrandList(generics.ListAPIView):
+    permission_classes = [AllowAny]
+    queryset = models.Brand.objects.all()
+    serializer_class = serializers.BrandSerializer
 
 # To randomize the products on the home screen
 class HomeCategoryList(generics.ListAPIView):

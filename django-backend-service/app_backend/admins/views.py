@@ -1,8 +1,9 @@
 from rest_framework import generics, status
-from core import models, serializers
+from core import models, serializers as core_serializers
+from . import serializers
 from rest_framework.response import Response
 from rest_framework.views import APIView
-from rest_framework.permissions import IsAuthenticated, IsAdminUser
+from rest_framework.permissions import IsAuthenticated
 from django.shortcuts import get_object_or_404
 from django.db.models import Count
 from django.utils import timezone
@@ -10,48 +11,77 @@ from datetime import datetime, timedelta
 from order import models as order_models, serializers as order_serializers
 import random
 
-class ProductList(generics.ListCreateAPIView):
+class ProductList(APIView):
     serializer_class = serializers.ProductSerializer
-    queryset = models.Product.objects.all()
     permission_classes = [IsAuthenticated]
 
-    def get_queryset(self):
-        page = self.request.query_params.get('page', 1)
+    def get(self, request):
+        page = int(request.query_params.get('page', 1))
         limit = 20
-        offset = (int(page) - 1) * limit
-        
-        queryset = models.Product.objects.all()
-        queryset = queryset.annotate(product_count=Count('id'))
+        offset = (page - 1) * limit
+
+        queryset = models.Product.objects.all().annotate(product_count=Count('id'))
         queryset = list(queryset)
-        
+
         random.shuffle(queryset)
-        
-        return queryset[offset:offset + limit]
+
+        serialized_data = self.serializer_class(queryset[offset:offset+limit], many=True).data
+
+        return Response({
+            "status": "success",
+            "data": serialized_data
+        })
 
 
-class CreateProduct(generics.CreateAPIView):
-    queryset = models.Product.objects.all()
-    serializer_class = serializers.ProductSerializer
-    permission_classes = [IsAdminUser]
+class CreateProduct(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def create(self, request, *args, **kwargs):
+    def post(self, request, *args, **kwargs):
         try:
-            data = {
-                "title": request.data.get("title"),
-                "price": float(request.data.get("price", 0.0)),
-                "description": request.data.get("description"),
-                "is_featured": request.data.get("is_featured", False),
-                "clothes_type": request.data.get("clothes_type", "unisex"),
-                "rating": float(request.data.get("rating", 1.0)),
-                "category": request.data.get("category"),
-                "brand": request.data.get("brand"),
-                "color": request.data.get("color", []),
-                "sizes": request.data.get("sizes", []),
-                "image_urls": request.data.get("image_urls", []),
-                "created_at": timezone.now()
-            }
+            # Validate and fetch related category and brand
+            category_id = request.data.get("category")
+            brand_id = request.data.get("brand")
+            
+            if not category_id or not brand_id:
+                return Response({
+                    "status": "error",
+                    "message": "Category and Brand are required fields"
+                }, status=status.HTTP_400_BAD_REQUEST)
 
-            serializer = self.get_serializer(data=data)
+            try:
+                category = models.Category.objects.get(id=category_id)
+            except models.Category.DoesNotExist:
+                return Response({
+                    "status": "error",
+                    "message": "Category not found"
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            try:
+                brand = models.Brand.objects.get(id=brand_id)
+            except models.Brand.DoesNotExist:
+                return Response({
+                    "status": "error",
+                    "message": "Brand not found"
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Update request data to use IDs for foreign key relationships
+            request_data = request.data.copy()
+            request_data["category"] = category.id
+            request_data["brand"] = brand.id
+
+            # Ensure optional fields are in the correct format
+            for field in ["color", "sizes", "image_urls"]:
+                if not isinstance(request_data.get(field, []), list):
+                    return Response({
+                        "status": "error",
+                        "message": f"{field} must be a list"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Add the creation timestamp
+            request_data["created_at"] = timezone.now()
+
+            # Serialize and validate the data
+            serializer = core_serializers.ProductSerializer(data=request_data)
             if serializer.is_valid():
                 serializer.save()
                 return Response({
@@ -59,7 +89,8 @@ class CreateProduct(generics.CreateAPIView):
                     "message": "Product created successfully",
                     "data": serializer.data
                 }, status=status.HTTP_201_CREATED)
-            
+
+            # Handle validation errors
             return Response({
                 "status": "error",
                 "message": "Invalid data provided",
@@ -67,59 +98,89 @@ class CreateProduct(generics.CreateAPIView):
             }, status=status.HTTP_400_BAD_REQUEST)
 
         except Exception as e:
+            # Catch all other unexpected exceptions
             return Response({
                 "status": "error",
-                "message": str(e)
+                "message": f"An error occurred: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
             
-class UpdateProduct(generics.UpdateAPIView):
-    queryset = models.Product.objects.all()
-    serializer_class = serializers.ProductSerializer
-    permission_classes = [IsAdminUser]
+class UpdateProduct(APIView):
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
 
-    def update(self, request, *args, **kwargs):
+    def put(self, request, *args, **kwargs):
         try:
-            instance = self.get_object()
-            data = {
-                "title": request.data.get("title", instance.title),
-                "price": float(request.data.get("price", instance.price)),
-                "description": request.data.get("description", instance.description),
-                "is_featured": request.data.get("is_featured", instance.is_featured),
-                "clothes_type": request.data.get("clothes_type", instance.clothes_type),
-                "rating": float(request.data.get("rating", instance.rating)),
-                "category": request.data.get("category", instance.category.id),
-                "brand": request.data.get("brand", instance.brand.id),
-                "color": request.data.get("color", instance.color),
-                "sizes": request.data.get("sizes", instance.sizes),
-                "image_urls": request.data.get("image_urls", instance.image_urls)
-            }
+            # Retrieve the product instance
+            product_id = kwargs.get(self.lookup_field)
+            instance = models.Product.objects.get(id=product_id)
 
-            serializer = self.get_serializer(instance, data=data, partial=True)
+            # Ensure `category` and `brand` are valid
+            category_id = request.data.get("category", instance.category.id)
+            brand_id = request.data.get("brand", instance.brand.id)
+
+            try:
+                category = models.Category.objects.get(id=category_id)
+            except models.Category.DoesNotExist:
+                return Response({
+                    "status": "error",
+                    "message": "Category not found"
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            try:
+                brand = models.Brand.objects.get(id=brand_id)
+            except models.Brand.DoesNotExist:
+                return Response({
+                    "status": "error",
+                    "message": "Brand not found"
+                }, status=status.HTTP_404_NOT_FOUND)
+
+            # Validate optional JSON fields
+            for field in ["color", "sizes", "image_urls"]:
+                if field in request.data and not isinstance(request.data[field], list):
+                    return Response({
+                        "status": "error",
+                        "message": f"{field} must be a list"
+                    }, status=status.HTTP_400_BAD_REQUEST)
+
+            # Update request data
+            request_data = request.data.copy()
+            request_data["category"] = category.id
+            request_data["brand"] = brand.id
+
+            # Partial update using serializer
+            serializer = core_serializers.ProductSerializer(instance, data=request_data, partial=True)
             if serializer.is_valid():
                 serializer.save()
                 return Response({
                     "status": "success",
                     "message": "Product updated successfully",
                     "data": serializer.data
-                })
-            
+                }, status=status.HTTP_200_OK)
+
+            # Handle validation errors
             return Response({
                 "status": "error",
                 "message": "Invalid data provided",
                 "errors": serializer.errors
             }, status=status.HTTP_400_BAD_REQUEST)
 
+        except models.Product.DoesNotExist:
+            return Response({
+                "status": "error",
+                "message": "Product not found"
+            }, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as e:
             return Response({
                 "status": "error",
-                "message": str(e)
+                "message": f"An error occurred: {str(e)}"
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
 
 class CreateCategory(generics.CreateAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -152,7 +213,7 @@ class CreateCategory(generics.CreateAPIView):
 class CreateBrand(generics.CreateAPIView):
     queryset = models.Brand.objects.all()
     serializer_class = serializers.BrandSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
 
     def create(self, request, *args, **kwargs):
         try:
@@ -185,7 +246,7 @@ class CreateBrand(generics.CreateAPIView):
 class DeleteProduct(generics.DestroyAPIView):
     queryset = models.Product.objects.all()
     serializer_class = serializers.ProductSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
 
     def destroy(self, request, *args, **kwargs):
@@ -205,7 +266,7 @@ class DeleteProduct(generics.DestroyAPIView):
 class DeleteCategory(generics.DestroyAPIView):
     queryset = models.Category.objects.all()
     serializer_class = serializers.CategorySerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
 
     def destroy(self, request, *args, **kwargs):
@@ -225,7 +286,7 @@ class DeleteCategory(generics.DestroyAPIView):
 class DeleteBrand(generics.DestroyAPIView):
     queryset = models.Brand.objects.all()
     serializer_class = serializers.BrandSerializer
-    permission_classes = [IsAdminUser]
+    permission_classes = [IsAuthenticated]
     lookup_field = 'id'
 
     def destroy(self, request, *args, **kwargs):
@@ -242,15 +303,12 @@ class DeleteBrand(generics.DestroyAPIView):
                 "message": str(e)
             }, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
-class OrderListCreateView(APIView):
+class OrderListCreateView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         """Get all orders"""
-        if request.user.is_staff:
-            orders = order_models.Order.objects.all().prefetch_related('items', 'items__product_id')
-        else:
-            orders = order_models.Order.objects.filter(user_id=request.user).prefetch_related('items', 'items__product_id')
+        orders = order_models.Order.objects.all().prefetch_related('items', 'items__product_id').select_related('address')
         
         serializer = order_serializers.OrderSerializer(orders, many=True)
         return Response(serializer.data)

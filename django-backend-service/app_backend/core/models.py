@@ -5,14 +5,14 @@ class Category(models.Model):
     title = models.CharField(max_length=255, unique=True)
     image_url = models.URLField(blank=False)
     
-    def _str_(self) -> str:
+    def __str__(self) -> str:
         return self.title
     
 class Brand(models.Model):
     title = models.CharField(max_length=255, unique=True)
     image_url = models.URLField(blank=False)
     
-    def _str_(self) -> str:
+    def __str__(self) -> str:
         return self.title
     
 class Product(models.Model):
@@ -30,5 +30,5 @@ class Product(models.Model):
     created_at = models.DateTimeField(blank=True)
     
     
-    def _str_(self) -> str:
+    def __str__(self) -> str:
         return self.title

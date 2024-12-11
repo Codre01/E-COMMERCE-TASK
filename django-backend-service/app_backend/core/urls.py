@@ -4,6 +4,7 @@ from core import views
 
 urlpatterns = [
     path('categories/', views.CategoryList.as_view(), name='category-list'),
+    path('brands/', views.BrandList.as_view(), name='brand-list'),
     path('categories/home/', views.HomeCategoryList.as_view(), name='home-category-list'),
     
     path('', views.ProductList.as_view(), name='product-list'),
